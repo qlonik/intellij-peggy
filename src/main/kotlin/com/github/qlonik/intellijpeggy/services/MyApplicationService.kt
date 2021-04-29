@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.qlonik.intellijpeggy.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.qlonik.intellijpeggy.MyBundle
 
 class MyApplicationService {
 
