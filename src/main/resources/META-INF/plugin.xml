@@ -8,18 +8,8 @@
   <depends>JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService
-        serviceImplementation="com.github.qlonik.intellij.peggy.services.MyApplicationService"
-    />
-    <projectService
-        serviceImplementation="com.github.qlonik.intellij.peggy.services.MyProjectService"
-    />
   </extensions>
 
   <applicationListeners>
-    <listener
-        class="com.github.qlonik.intellij.peggy.listeners.MyProjectManagerListener"
-        topic="com.intellij.openapi.project.ProjectManagerListener"
-    />
   </applicationListeners>
 </idea-plugin>
