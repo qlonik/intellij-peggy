@@ -1,13 +1,15 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.changelog.closure
+import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     // Java support
-    id("java")
+    java
     // Kotlin support
     id("org.jetbrains.kotlin.jvm") version "1.5.0"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
@@ -28,6 +30,7 @@ repositories {
     mavenCentral()
     jcenter()
 }
+
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.16.0")
 }
@@ -42,13 +45,20 @@ intellij {
     updateSinceUntilBuild = true
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    setPlugins(*properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty).toTypedArray())
+    setPlugins(
+        *properties("platformPlugins")
+            .split(',')
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .toTypedArray()
+    )
 }
 
 // Configure gradle-changelog-plugin plugin.
 // Read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     version = properties("pluginVersion")
+    header = closure { "[$version] - ${date()}" }
     groups = emptyList()
 }
 
@@ -67,19 +77,24 @@ detekt {
 
 tasks {
     // Set the compatibility versions to 1.8
-    withType<JavaCompile> {
+    withType<JavaCompile>().configureEach {
         sourceCompatibility = "1.8"
         targetCompatibility = "1.8"
     }
-    withType<KotlinCompile> {
+    withType<KotlinCompile>().configureEach {
         kotlinOptions.jvmTarget = "1.8"
     }
 
-    withType<Detekt> {
+    withType<Detekt>().configureEach {
         jvmTarget = "1.8"
     }
 
+    withType<BuildSearchableOptionsTask>().configureEach {
+        enabled = false
+    }
+
     patchPluginXml {
+        pluginId(properties("pluginGroup"))
         version(properties("pluginVersion"))
         sinceBuild(properties("pluginSinceBuild"))
         untilBuild(properties("pluginUntilBuild"))
@@ -87,15 +102,20 @@ tasks {
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription(
             closure {
-                File(projectDir, "README.md").readText().lines().run {
-                    val start = "<!-- Plugin description -->"
-                    val end = "<!-- Plugin description end -->"
+                File(projectDir, "README.md")
+                    .readText()
+                    .lines()
+                    .run {
+                        val start = "<!-- Plugin description -->"
+                        val end = "<!-- Plugin description end -->"
 
-                    if (!containsAll(listOf(start, end))) {
-                        throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                        if (!containsAll(listOf(start, end))) {
+                            throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                        }
+                        subList(indexOf(start) + 1, indexOf(end))
                     }
-                    subList(indexOf(start) + 1, indexOf(end))
-                }.joinToString("\n").run { markdownToHTML(this) }
+                    .joinToString("\n")
+                    .run { markdownToHTML(this) }
             }
         )
 
@@ -117,6 +137,12 @@ tasks {
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first())
+        channels(
+            properties("pluginVersion")
+                .split('-')
+                .getOrElse(1) { "default" }
+                .split('.')
+                .first()
+        )
     }
 }

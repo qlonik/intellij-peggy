@@ -1,4 +1,4 @@
-package com.github.qlonik.intellijpeggy
+package com.github.qlonik.intellij.peggy
 
 import com.intellij.AbstractBundle
 import org.jetbrains.annotations.NonNls
