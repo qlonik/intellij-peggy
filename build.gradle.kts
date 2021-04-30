@@ -78,15 +78,15 @@ detekt {
 tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile>().configureEach {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     withType<KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     withType<Detekt>().configureEach {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 
     withType<BuildSearchableOptionsTask>().configureEach {
