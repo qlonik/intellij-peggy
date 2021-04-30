@@ -8,6 +8,13 @@
   <depends>JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <fileType
+        name="Peggy"
+        implementationClass="com.github.qlonik.intellij.peggy.PeggyFileType"
+        fieldName="INSTANCE"
+        language="Peggy"
+        extensions="pegjs"
+    />
   </extensions>
 
   <applicationListeners>
