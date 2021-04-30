@@ -1,0 +1,16 @@
+{
+  parserClass="com.github.qlonik.intellij.peggy.parser.PeggyParser"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Peggy"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.github.qlonik.intellij.peggy.psi"
+  psiImplPackage="com.github.qlonik.intellij.peggy.psi.impl"
+
+  elementTypeHolderClass="com.github.qlonik.intellij.peggy.psi.PeggyTypes"
+  elementTypeClass="com.github.qlonik.intellij.peggy.psi.PeggyElementType"
+  tokenTypeClass="com.github.qlonik.intellij.peggy.psi.PeggyTokenType"
+}
+
+peggyFile
+    ::= KEY*

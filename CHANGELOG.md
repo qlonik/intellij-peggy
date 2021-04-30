@@ -3,6 +3,8 @@
 # intellij-peggy Changelog
 
 ## [Unreleased]
+### Added
+- Initial grammar and parser for Peggy files
 ### Changed
 - Load and export icon in a way recommended in [docs for working with icons](https://plugins.jetbrains.com/docs/intellij/work-with-icons-and-images.html)
 

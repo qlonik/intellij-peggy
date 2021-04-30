@@ -2,6 +2,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.changelog.closure
 import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.grammarkit.tasks.GenerateParser
 import org.jetbrains.intellij.tasks.BuildSearchableOptionsTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -10,6 +11,8 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     // Java support
     java
+    // import plugin in idea
+    idea
     // Kotlin support
     id("org.jetbrains.kotlin.jvm") version "1.5.0"
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
@@ -20,6 +23,8 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.16.0"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    // grammarkit support - read more: https://github.com/JetBrains/gradle-grammar-kit-plugin/
+    id("org.jetbrains.grammarkit") version "2021.1.2"
 }
 
 group = properties("pluginGroup")
@@ -33,6 +38,18 @@ repositories {
 
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.16.0")
+}
+
+sourceSets {
+    main {
+        java.srcDirs("src/main/gen")
+    }
+}
+
+idea {
+    module {
+        generatedSourceDirs.add(file("src/main/gen"))
+    }
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -75,6 +92,14 @@ detekt {
     }
 }
 
+val GeneratePeggyParser = task<GenerateParser>("generatePeggyParser") {
+    source = "src/main/grammars/Peggy.bnf"
+    targetRoot = "src/main/gen"
+    pathToParser = "/com/github/qlonik/intellij/peggy/parser/PegjsParser.java"
+    pathToPsiRoot = "/com/github/qlonik/intellij/peggy/psi"
+    purgeOldFiles = true
+}
+
 tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile>().configureEach {
@@ -82,6 +107,9 @@ tasks {
         targetCompatibility = "11"
     }
     withType<KotlinCompile>().configureEach {
+        dependsOn(
+            GeneratePeggyParser
+        )
         kotlinOptions.jvmTarget = "11"
     }
 
